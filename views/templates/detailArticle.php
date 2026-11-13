@@ -31,6 +31,10 @@
                 echo '  <div class="detailComment">';
                 echo '      <h3 class="info">Le ' . Utils::convertDateToFrenchFormat($comment->getDateCreation()) . ", " . Utils::format($comment->getPseudo()) . ' a écrit :</h3>';
                 echo '      <p class="content">' . Utils::format($comment->getContent()) . '</p>';
+                // Bouton de suppression : visible uniquement quand Emilie est connectée.
+                if (isset($_SESSION['user'])) {
+                    echo '      <a class="submit deleteComment" href="index.php?action=deleteComment&id=' . $comment->getId() . '" ' . Utils::askConfirmation("Êtes-vous sûr de vouloir supprimer ce commentaire ?") . '>Supprimer</a>';
+                }
                 echo '  </div>';
                 echo '</li>';
             }               

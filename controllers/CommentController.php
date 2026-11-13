@@ -44,4 +44,32 @@ class CommentController
         // On redirige vers la page de l'article.
         Utils::redirect("showArticle", ['id' => $idArticle]);
     }
+
+    /**
+     * Supprime un commentaire. Réservé à l'utilisateur connecté (admin).
+     * @return void
+     */
+    public function deleteComment() : void
+    {
+        // Seule Emilie, une fois connectée, peut supprimer un commentaire.
+        if (!isset($_SESSION['user'])) {
+            Utils::redirect("connectionForm");
+        }
+
+        // On récupère le commentaire à supprimer.
+        $id = Utils::request("id", -1);
+        $commentManager = new CommentManager();
+        $comment = $commentManager->getCommentById($id);
+        if (!$comment) {
+            throw new Exception("Le commentaire demandé n'existe pas.");
+        }
+
+        // On garde l'id de l'article pour revenir sur sa page après la suppression.
+        $idArticle = $comment->getIdArticle();
+
+        $commentManager->deleteComment($comment);
+
+        // On redirige vers la page de l'article.
+        Utils::redirect("showArticle", ['id' => $idArticle]);
+    }
 }

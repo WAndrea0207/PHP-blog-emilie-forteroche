@@ -283,6 +283,13 @@ a.info {
     margin: 5px 0 5px 0;
 }
 
+/* Bouton "Supprimer" sous un commentaire (visible seulement pour l'admin connectée) */
+.deleteComment {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
 /* Page d'erreur */
 
 .error {
