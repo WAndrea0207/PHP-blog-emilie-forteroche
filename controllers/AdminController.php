@@ -26,6 +26,29 @@ class AdminController {
     }
 
     /**
+     * Affiche la page de monitoring : liste des articles avec vues, commentaires et date.
+     * @return void
+     */
+    public function showMonitoring() : void
+    {
+        $this->checkIfUserIsConnected();
+
+        // Tri demandé par l'utilisateur (par défaut : date, du plus récent au plus ancien).
+        $sortBy = Utils::request('sort', 'date');
+        $order = Utils::request('order', 'DESC');
+
+        $articleManager = new ArticleManager();
+        $articles = $articleManager->getArticlesForMonitoring($sortBy, $order);
+
+        $view = new View("Monitoring");
+        $view->render("monitoring", [
+            'articles' => $articles,
+            'sortBy' => $sortBy,
+            'order' => strtoupper($order) === 'ASC' ? 'ASC' : 'DESC',
+        ]);
+    }
+
+    /**
      * Vérifie que l'utilisateur est connecté.
      * @return void
      */

@@ -22,6 +22,36 @@ class ArticleManager extends AbstractEntityManager
     }
     
     /**
+     * Récupère tous les articles avec leur nombre de commentaires, pour la page de monitoring.
+     * @param string $sortBy : la colonne de tri : 'title', 'views', 'comments' ou 'date'.
+     * @param string $order : 'ASC' (croissant) ou 'DESC' (décroissant).
+     * @return array : un tableau d'objets Article.
+     */
+    public function getArticlesForMonitoring(string $sortBy, string $order) : array
+    {
+        // Liste blanche : seules ces colonnes peuvent servir au tri (protection contre l'injection SQL).
+        $columns = [
+            'title' => 'a.title',
+            'views' => 'a.nb_views',
+            'comments' => 'nb_comments',
+            'date' => 'a.date_creation',
+        ];
+        $orderBy = $columns[$sortBy] ?? 'a.date_creation';
+        $direction = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
+
+        $sql = "SELECT a.*, (SELECT COUNT(*) FROM comment c WHERE c.id_article = a.id) AS nb_comments
+                FROM article a
+                ORDER BY $orderBy $direction";
+        $result = $this->db->query($sql);
+        $articles = [];
+
+        while ($article = $result->fetch()) {
+            $articles[] = new Article($article);
+        }
+        return $articles;
+    }
+
+    /**
      * Récupère un article par son id.
      * @param int $id : l'id de l'article.
      * @return Article|null : un objet Article ou null si l'article n'existe pas.
@@ -80,6 +110,17 @@ class ArticleManager extends AbstractEntityManager
             'content' => $article->getContent(),
             'id' => $article->getId()
         ]);
+    }
+
+    /**
+     * Ajoute une vue à un article (incrémente nb_views de 1).
+     * @param int $id : l'id de l'article.
+     * @return void
+     */
+    public function addView(int $id) : void
+    {
+        $sql = "UPDATE article SET nb_views = nb_views + 1 WHERE id = :id";
+        $this->db->query($sql, ['id' => $id]);
     }
 
     /**

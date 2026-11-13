@@ -350,3 +350,39 @@ footer {
     color: white;
     background-color: var(--headerColor);
 }
+
+/**
+ * Page de monitoring (partie admin) : tableau des articles.
+ * Prévu pour un écran de 1366 px minimum, pas de version mobile.
+ */
+.monitoringTable {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.monitoringTable th {
+    padding: 12px;
+    text-align: left;
+    color: white;
+    background-color: var(--commentColor);
+}
+
+.monitoringTable th a {
+    color: white;
+}
+
+.monitoringTable td {
+    padding: 12px;
+    color: var(--commentColor);
+}
+
+/* Une ligne sur deux a une couleur de fond différente, pour la lisibilité */
+.monitoringTable .oddRow {
+    background-color: white;
+}
+
+.monitoringTable .evenRow {
+    background-color: var(--headerPaleColor);
+}

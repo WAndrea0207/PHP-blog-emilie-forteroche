@@ -11,6 +11,44 @@
     private string $content = "";
     private ?DateTime $dateCreation = null;
     private ?DateTime $dateUpdate = null;  
+    private int $nbComments = 0; // Nombre de commentaires (calculé par la requête du monitoring, pas stocké en base)
+    private int $nbViews = 0;    // Nombre de vues, stocké dans la colonne nb_views de la table article
+
+    /**
+     * Setter pour le nombre de vues.
+     * @param int $nbViews
+     */
+    public function setNbViews(int $nbViews) : void 
+    {
+        $this->nbViews = $nbViews;
+    }
+
+    /**
+     * Getter pour le nombre de vues.
+     * @return int
+     */
+    public function getNbViews() : int 
+    {
+        return $this->nbViews;
+    }
+
+    /**
+     * Setter pour le nombre de commentaires.
+     * @param int $nbComments
+     */
+    public function setNbComments(int $nbComments) : void 
+    {
+        $this->nbComments = $nbComments;
+    }
+
+    /**
+     * Getter pour le nombre de commentaires.
+     * @return int
+     */
+    public function getNbComments() : int 
+    {
+        return $this->nbComments;
+    }
 
     /**
      * Setter pour l'id de l'utilisateur. 

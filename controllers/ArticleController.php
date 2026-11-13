@@ -31,6 +31,9 @@ class ArticleController
             throw new Exception("L'article demandé n'existe pas.");
         }
 
+        // Chaque affichage de l'article compte comme une vue.
+        $articleManager->addView($id);
+
         $commentManager = new CommentManager();
         $comments = $commentManager->getAllCommentsByArticleId($id);
 
