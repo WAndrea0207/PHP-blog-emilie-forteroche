@@ -23,25 +23,13 @@ class ArticleManager extends AbstractEntityManager
     
     /**
      * Récupère tous les articles avec leur nombre de commentaires, pour la page de monitoring.
-     * @param string $sortBy : la colonne de tri : 'title', 'views', 'comments' ou 'date'.
-     * @param string $order : 'ASC' (croissant) ou 'DESC' (décroissant).
+     * Pas de tri ici : le tri se fait en PHP dans le contrôleur (AdminController::sortArticles).
      * @return array : un tableau d'objets Article.
      */
-    public function getArticlesForMonitoring(string $sortBy, string $order) : array
+    public function getArticlesForMonitoring() : array
     {
-        // Liste blanche : seules ces colonnes peuvent servir au tri (protection contre l'injection SQL).
-        $columns = [
-            'title' => 'a.title',
-            'views' => 'a.nb_views',
-            'comments' => 'nb_comments',
-            'date' => 'a.date_creation',
-        ];
-        $orderBy = $columns[$sortBy] ?? 'a.date_creation';
-        $direction = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
-
         $sql = "SELECT a.*, (SELECT COUNT(*) FROM comment c WHERE c.id_article = a.id) AS nb_comments
-                FROM article a
-                ORDER BY $orderBy $direction";
+                FROM article a";
         $result = $this->db->query($sql);
         $articles = [];
 

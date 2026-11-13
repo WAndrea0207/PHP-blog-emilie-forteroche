@@ -33,19 +33,56 @@ class AdminController {
     {
         $this->checkIfUserIsConnected();
 
-        // Tri demandé par l'utilisateur (par défaut : date, du plus récent au plus ancien).
+        // Colonne de tri demandée, et sens du tri. Valeurs par défaut : date, du plus récent au plus ancien.
+        // Toute valeur inconnue est remplacée par la valeur par défaut (liste blanche).
         $sortBy = Utils::request('sort', 'date');
-        $order = Utils::request('order', 'DESC');
+        if (!in_array($sortBy, ['title', 'views', 'comments', 'date'])) {
+            $sortBy = 'date';
+        }
+        $order = strtoupper(Utils::request('order', 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
 
         $articleManager = new ArticleManager();
-        $articles = $articleManager->getArticlesForMonitoring($sortBy, $order);
+        $articles = $articleManager->getArticlesForMonitoring();
+        $articles = $this->sortArticles($articles, $sortBy, $order);
 
         $view = new View("Monitoring");
         $view->render("monitoring", [
             'articles' => $articles,
             'sortBy' => $sortBy,
-            'order' => strtoupper($order) === 'ASC' ? 'ASC' : 'DESC',
+            'order' => $order,
         ]);
+    }
+
+    /**
+     * Trie un tableau d'articles en PHP (sans passer par la base de données).
+     * @param array $articles : tableau d'objets Article.
+     * @param string $sortBy : 'title', 'views', 'comments' ou 'date'.
+     * @param string $order : 'ASC' (croissant) ou 'DESC' (décroissant).
+     * @return array : le même tableau, trié.
+     */
+    private function sortArticles(array $articles, string $sortBy, string $order) : array
+    {
+        usort($articles, function (Article $a, Article $b) use ($sortBy) {
+            // On compare deux articles selon la colonne demandée.
+            // <=> renvoie -1 si le premier est plus petit, 0 s'ils sont égaux, 1 s'il est plus grand.
+            switch ($sortBy) {
+                case 'title':
+                    // Comparaison insensible à la casse, pour que "a" et "B" soient bien classés.
+                    return strcmp(mb_strtolower($a->getTitle()), mb_strtolower($b->getTitle()));
+                case 'views':
+                    return $a->getNbViews() <=> $b->getNbViews();
+                case 'comments':
+                    return $a->getNbComments() <=> $b->getNbComments();
+                default: // 'date'
+                    return $a->getDateCreation() <=> $b->getDateCreation();
+            }
+        });
+
+        // En décroissant, on inverse le résultat de la comparaison.
+        if ($order === 'DESC') {
+            $articles = array_reverse($articles);
+        }
+        return $articles;
     }
 
     /**
